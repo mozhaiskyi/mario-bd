@@ -1643,7 +1643,7 @@
             msPerFrame: 1000 / 60
         },
         JUMPING: {
-            frames: [0],
+            frames: [44],
             msPerFrame: 1000 / 60
         },
         DUCKING: {
