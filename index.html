@@ -11,9 +11,10 @@
 </head>
 
 <body id="t" class="offline">
-    <div id="messageBox" class="sendmessage">
-         <div class="niokbutton" onclick="okbuttonsend()"></div>
-    </div>
+<!--    <div id="messageBox" class="sendmessage">-->
+<!--        <h1 style="text-align: center;font-family: 'Open Sans', sans-serif;">Press Space to start</h1>-->
+<!--        <div class="niokbutton" onclick="okbuttonsend()"></div>-->
+<!--    </div>-->
     <div id="main-frame-error" class="interstitial-wrapper">
         <div id="main-content">
             <div class="icon icon-offline" alt=""></div>
@@ -39,12 +40,55 @@
 </body>
 
 <script>
-    document.onkeydown = function(evt) {
-        if (evt.code === 'Space') {
-            document.getElementById("messageBox").style.visibility="hidden";
-            document.getElementById("details").style.visibility="hidden";
+    const consoleWrapper = {
+        log: (message, options) => {
+            const defaultOptions = {color: 'red', fontSize: '3rem', delay: 0}
+            const optionsToUse = {...defaultOptions, ...options}
+            setTimeout(
+              () => {
+                  console.log(
+                    `%c${message}`, // everything after the %c is styled
+                    `color: ${optionsToUse.color}; font-weight: bold; font-size: ${optionsToUse.fontSize};`,
+                  )
+              },
+              optionsToUse.delay,
+            )
+        },
+    }
+    const FRED_REQUIRES_SCORE = 600
+    const messages = {
+        neTupi: `Andryuha, ne tupi, it's time to press SPACE!`,
+        goodJob: 'Good job! 🥳',
+        timeToDominate: `Now it's time to score ${FRED_REQUIRES_SCORE} points 😎`,
+        rememberAboutSound: 'Remember to make your sound louder 🔈'
+    }
+    let isInstructionsPrinted = false;
+
+    window.addEventListener('load', () => {
+        consoleWrapper.log(messages.neTupi)
+    })
+    window.addEventListener('beforeunload', (event) => {
+        event.preventDefault()
+        event.returnValue = messages.neTupi
+    })
+
+    document.addEventListener('keydown', (event) => {
+        if (event.code === 'Space') {
+            // document.getElementById('messageBox').style.visibility = 'hidden'
+            document.getElementById('details').style.visibility = 'hidden'
+
+            if(!isInstructionsPrinted){
+                console.clear();
+                consoleWrapper.log(messages.goodJob, {color: 'green'})
+                consoleWrapper.log(messages.timeToDominate, {color: 'green', fontSize: '2rem', delay: 1000})
+                consoleWrapper.log(messages.rememberAboutSound, {color: 'green', fontSize: '2rem', delay: 2000})
+                isInstructionsPrinted = true
+            }
+
+
+
         }
-};
+    })
 </script>
 
 </html>
