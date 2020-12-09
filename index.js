@@ -36,7 +36,7 @@
         this.distanceRan = 0;
 
         this.highestScore = 0;
-        this.FRED_REQUIRES_SCORE = 20;
+        this.FRED_REQUIRES_SCORE = 1000;
 
         this.time = 0;
         this.runningTime = 0;
