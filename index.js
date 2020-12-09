@@ -313,22 +313,22 @@
          */
         loadSounds: function () {
             if (!IS_IOS) {
-                this.audioContext = new AudioContext();
+                this.audioContext = new AudioContext()
 
-                var resourceTemplate =
-                    document.getElementById(this.config.RESOURCE_TEMPLATE_ID).content;
+                const resourceTemplate =
+                  document.getElementById(this.config.RESOURCE_TEMPLATE_ID).content
 
-                for (var sound in Runner.sounds) {
-                    var soundSrc =
-                        resourceTemplate.getElementById(Runner.sounds[sound]).src;
-                    soundSrc = soundSrc.substr(soundSrc.indexOf(',') + 1);
-                    var buffer = decodeBase64ToArrayBuffer(soundSrc);
-
-                    // Async, so no guarantee of order in array.
-                    this.audioContext.decodeAudioData(buffer, function (index, audioData) {
-                        this.soundFx[index] = audioData;
-                    }.bind(this, sound));
+                const loadSoundFile = (url) => fetch(url).then(res => res.arrayBuffer())
+                const decodeAudioData = (key) => (buffer) => {
+                    this.audioContext.decodeAudioData(buffer).then(audioData => {
+                        this.soundFx[key] = audioData
+                    })
                 }
+
+                Object.keys(Runner.sounds).forEach((soundKey) => {
+                    const soundUrl = resourceTemplate.getElementById(Runner.sounds[soundKey]).src
+                    loadSoundFile(soundUrl).then(decodeAudioData(soundKey))
+                })
             }
         },
 
