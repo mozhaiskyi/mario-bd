@@ -921,7 +921,17 @@
                 if(this.victorySong) {
                     this.victorySong.stop()
                 }
-                this.playSound(this.soundFx.BUTTON_PRESS);
+                // this.playSound(this.soundFx.BUTTON_PRESS);
+                const result = this.playSound(
+                  this.soundFx.MAIN,
+                  {
+                      loop: true,
+                  },
+                )
+                if(result){
+                    this.mainSong = result[0];
+                    this.mainSongStartedAt = result[1].startedAt;
+                }
                 this.invert(true);
                 this.update();
             }
