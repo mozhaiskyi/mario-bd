@@ -60,6 +60,9 @@
         this.audioBuffer = null;
         this.soundFx = {};
         this.victorySong = null;
+        this.mainSong = null;
+        this.mainSongStartedAt = null;
+        this.mainSongPausedAt = null;
 
         // Global web audio context for playing sounds.
         this.audioContext = null;
@@ -200,6 +203,7 @@
         HIT: 'offline-sound-hit',
         SCORE: 'offline-sound-reached',
         VICTORY: 'happy-b8-song',
+        MAIN: 'main-song',
     };
 
 
@@ -504,6 +508,19 @@
                 // }
                 this.playing = true;
                 this.activated = true;
+                const result = this.playSound(
+                  this.soundFx.MAIN,
+                  {
+                      loop: true,
+                      startedAt: this.mainSongStartedAt,
+                      pausedAt: this.mainSongPausedAt
+                  },
+                )
+                if(result){
+                    this.mainSong = result[0];
+                    this.mainSongStartedAt = result[1].startedAt;
+                }
+
             } else if (this.crashed || this.won) {
                 this.restart();
             }
@@ -826,7 +843,8 @@
         },
 
         victory: function () {
-            this.victorySong = this.playSound(this.soundFx.VICTORY);
+            const result = this.playSound(this.soundFx.VICTORY);
+            this.victorySong = result && result[0];
             vibrate(200);
 
             this.stop();
@@ -853,6 +871,9 @@
 
         stop: function () {
             this.playing = false;
+            const result = this.stopSound(this.mainSong, {startedAt: this.mainSongStartedAt});
+            this.mainSongPausedAt = result && result.pausedAt;
+
             this.paused = true;
             cancelAnimationFrame(this.raqId);
             this.raqId = 0;
@@ -861,6 +882,20 @@
         play: function () {
             if (!this.crashed && !this.won) {
                 this.playing = true;
+
+                const result = this.playSound(
+                  this.soundFx.MAIN,
+                  {
+                      loop: true,
+                      startedAt: this.mainSongStartedAt,
+                      pausedAt: this.mainSongPausedAt
+                  },
+                )
+                if(result){
+                    this.mainSong = result[0];
+                    this.mainSongStartedAt = result[1].startedAt;
+                }
+
                 this.paused = false;
                 this.tRex.update(0, Trex.status.RUNNING);
                 this.time = getTimeStamp();
@@ -943,14 +978,32 @@
         /**
          * Play a sound.
          * @param {SoundBuffer} soundBuffer
+         * @param {Object} options
          */
-        playSound: function (soundBuffer) {
+        playSound: function (soundBuffer, options={}) {
+            let { loop = false, pausedAt, startedAt } = options;
             if (soundBuffer) {
                 var sourceNode = this.audioContext.createBufferSource();
                 sourceNode.buffer = soundBuffer;
                 sourceNode.connect(this.audioContext.destination);
-                sourceNode.start(0);
-                return sourceNode;
+                sourceNode.loop = loop;
+                if (pausedAt) {
+                    startedAt = Date.now() - pausedAt;
+                    sourceNode.start(0, pausedAt / 1000);
+                }
+                else {
+                    startedAt = Date.now();
+                    sourceNode.start(0);
+                }
+                return [sourceNode, {startedAt}];
+            }
+        },
+
+        stopSound: (soundSource, options) => {
+            const {startedAt} = options || {};
+            if(soundSource){
+                soundSource.stop(0);
+                return { pausedAt:  Date.now() - startedAt };
             }
         },
 
