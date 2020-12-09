@@ -36,6 +36,7 @@
         this.distanceRan = 0;
 
         this.highestScore = 0;
+        this.FRED_REQUIRES_SCORE = 20;
 
         this.time = 0;
         this.runningTime = 0;
@@ -47,6 +48,7 @@
         this.activated = false; // Whether the easter egg has been activated.
         this.playing = false; // Whether the game is currently in play state.
         this.crashed = false;
+        this.won = false;
         this.paused = false;
         this.inverted = false;
         this.invertTimer = 0;
@@ -445,13 +447,19 @@
                 this.tRex.update(0);
 
                 // Outer container and distance meter.
-                if (this.playing || this.crashed || this.paused) {
+                if (this.playing || this.crashed || this.paused || this.won) {
                     this.containerEl.style.width = this.dimensions.WIDTH + 'px';
                     this.containerEl.style.height = this.dimensions.HEIGHT + 'px';
                     this.distanceMeter.update(0, Math.ceil(this.distanceRan));
                     this.stop();
                 } else {
                     this.tRex.draw(0, 0);
+                }
+
+                // Victory panel
+                if(this.won && this.victoryPanel){
+                    this.victoryPanel.updateDimensions(this.dimensions.WIDTH);
+                    this.victoryPanel.draw();
                 }
 
                 // Game over panel.
@@ -467,7 +475,7 @@
          * Canvas container width expands out to the full width.
          */
         playIntro: function () {
-            if (!this.activated && !this.crashed) {
+            if (!this.activated && !this.crashed && !this.won) {
                 this.playingIntro = true;
                 this.tRex.playingIntro = true;
 
@@ -476,9 +484,9 @@
                     'from { width:' + Trex.config.WIDTH + 'px }' +
                     'to { width: ' + this.dimensions.WIDTH + 'px }' +
                     '}';
-                
-                // create a style sheet to put the keyframe rule in 
-                // and then place the style sheet in the html head    
+
+                // create a style sheet to put the keyframe rule in
+                // and then place the style sheet in the html head
                 var sheet = document.createElement('style');
                 sheet.innerHTML = keyframes;
                 document.head.appendChild(sheet);
@@ -494,7 +502,7 @@
                 // }
                 this.playing = true;
                 this.activated = true;
-            } else if (this.crashed) {
+            } else if (this.crashed || this.won) {
                 this.restart();
             }
         },
@@ -583,6 +591,10 @@
 
                 if (playAchievementSound) {
                     this.playSound(this.soundFx.SCORE);
+                }
+
+                if(this.distanceMeter.getActualDistance(Math.ceil(this.distanceRan)) >= this.FRED_REQUIRES_SCORE){
+                    this.victory();
                 }
 
                 // Night mode.
@@ -683,7 +695,7 @@
             }
 
             if (e.target != this.detailsButton) {
-                if (!this.crashed && (Runner.keycodes.JUMP[e.keyCode] ||
+                if (!this.crashed && !this.won && (Runner.keycodes.JUMP[e.keyCode] ||
                     e.type == Runner.events.TOUCHSTART)) {
                     if (!this.playing) {
                         this.loadSounds();
@@ -700,13 +712,13 @@
                     }
                 }
 
-                if (this.crashed && e.type == Runner.events.TOUCHSTART &&
+                if ((this.crashed || this.won) && e.type == Runner.events.TOUCHSTART &&
                     e.currentTarget == this.containerEl) {
                     this.restart();
                 }
             }
 
-            if (this.playing && !this.crashed && Runner.keycodes.DUCK[e.keyCode]) {
+            if (this.playing && !this.crashed && !this.won && Runner.keycodes.DUCK[e.keyCode]) {
                 e.preventDefault();
                 if (this.tRex.jumping) {
                     // Speed drop, activated only when jump key is not pressed.
@@ -734,7 +746,7 @@
             } else if (Runner.keycodes.DUCK[keyCode]) {
                 this.tRex.speedDrop = false;
                 this.tRex.setDuck(false);
-            } else if (this.crashed) {
+            } else if (this.crashed || this.won) {
                 // Check that enough time has elapsed before allowing jump key to restart.
                 var deltaTime = getTimeStamp() - this.time;
 
@@ -811,6 +823,31 @@
             this.time = getTimeStamp();
         },
 
+        victory: function () {
+            vibrate(200);
+
+            this.stop();
+            this.won = true;
+            this.distanceMeter.acheivement = false;
+
+            if (!this.victoryPanel) {
+                this.victoryPanel = new VictoryPanel(this.canvas,
+                  this.spriteDef.TEXT_SPRITE, this.spriteDef.RESTART,
+                  this.dimensions);
+            }
+            this.victoryPanel.draw();
+
+
+            // Update the high score.
+            if (this.distanceRan > this.highestScore) {
+                this.highestScore = Math.ceil(this.distanceRan);
+                this.distanceMeter.setHighScore(this.highestScore);
+            }
+
+            // Reset the time clock.
+            this.time = getTimeStamp();
+        },
+
         stop: function () {
             this.playing = false;
             this.paused = true;
@@ -819,7 +856,7 @@
         },
 
         play: function () {
-            if (!this.crashed) {
+            if (!this.crashed && !this.won) {
                 this.playing = true;
                 this.paused = false;
                 this.tRex.update(0, Trex.status.RUNNING);
@@ -834,6 +871,7 @@
                 this.runningTime = 0;
                 this.playing = true;
                 this.crashed = false;
+                this.won = false;
                 this.distanceRan = 0;
                 this.setSpeed(this.config.SPEED);
                 this.time = getTimeStamp();
@@ -890,7 +928,7 @@
             if (document.hidden || document.webkitHidden || e.type == 'blur' ||
                 document.visibilityState != 'visible') {
                 this.stop();
-            } else if (!this.crashed) {
+            } else if (!this.crashed && !this.won) {
                 this.tRex.reset();
                 this.play();
             }
@@ -1042,6 +1080,50 @@
 
     //******************************************************************************
 
+    const VictoryPanelDimensions = {
+        TEXT_X: 0,
+        TEXT_Y: 13,
+        TEXT_WIDTH: 191,
+        TEXT_HEIGHT: 11,
+        RESTART_WIDTH: 36,
+        RESTART_HEIGHT: 32
+    }
+
+    function VictoryPanel(canvas, textImgPos, restartImgPos, dimensions){
+        let canvasDimensions = dimensions;
+        return {
+            draw: () => {
+                let centerX = canvasDimensions.WIDTH / 2;
+
+                let restartSourceWidth = VictoryPanelDimensions.RESTART_WIDTH;
+                let restartSourceHeight = VictoryPanelDimensions.RESTART_HEIGHT;
+                let restartTargetX = centerX - (VictoryPanelDimensions.RESTART_WIDTH / 2);
+                let restartTargetY = canvasDimensions.HEIGHT / 2;
+
+                if (IS_HIDPI) {
+                    restartSourceWidth *= 2;
+                    restartSourceHeight *= 2;
+                }
+
+                const canvasCtx = canvas.getContext('2d')
+                canvasCtx.font = '48px sans-serif';
+                canvasCtx.fillText('Happy Birthday!!!', 10, 50);
+
+                // Restart button.
+                canvasCtx.drawImage(Runner.imageSprite,
+                  restartImgPos.x, restartImgPos.y,
+                  restartSourceWidth, restartSourceHeight,
+                  restartTargetX, restartTargetY, VictoryPanelDimensions.RESTART_WIDTH,
+                  VictoryPanelDimensions.RESTART_HEIGHT);
+            },
+            updateDimensions: (width, opt_height) => {
+                canvasDimensions.WIDTH = width;
+                if (opt_height) {
+                    canvasDimensions.HEIGHT = opt_height;
+                }
+            },
+        }
+    }
 
     /**
      * Game over panel.
