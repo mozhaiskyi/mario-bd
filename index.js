@@ -36,7 +36,7 @@
         this.distanceRan = 0;
 
         this.highestScore = 0;
-        this.FRED_REQUIRES_SCORE = 1000;
+        this.FRED_REQUIRES_SCORE = 200;
 
         this.time = 0;
         this.runningTime = 0;
@@ -59,6 +59,7 @@
         // Sound FX.
         this.audioBuffer = null;
         this.soundFx = {};
+        this.victorySong = null;
 
         // Global web audio context for playing sounds.
         this.audioContext = null;
@@ -197,7 +198,8 @@
     Runner.sounds = {
         BUTTON_PRESS: 'offline-sound-press',
         HIT: 'offline-sound-hit',
-        SCORE: 'offline-sound-reached'
+        SCORE: 'offline-sound-reached',
+        VICTORY: 'happy-b8-song',
     };
 
 
@@ -824,6 +826,7 @@
         },
 
         victory: function () {
+            this.victorySong = this.playSound(this.soundFx.VICTORY);
             vibrate(200);
 
             this.stop();
@@ -880,6 +883,9 @@
                 this.distanceMeter.reset(this.highestScore);
                 this.horizon.reset();
                 this.tRex.reset();
+                if(this.victorySong) {
+                    this.victorySong.stop()
+                }
                 this.playSound(this.soundFx.BUTTON_PRESS);
                 this.invert(true);
                 this.update();
@@ -944,6 +950,7 @@
                 sourceNode.buffer = soundBuffer;
                 sourceNode.connect(this.audioContext.destination);
                 sourceNode.start(0);
+                return sourceNode;
             }
         },
 
