@@ -3092,7 +3092,8 @@ const birthdayFunc = (isPlaying) => {
 
 
 function onDocumentLoad() {
-    new Runner('.interstitial-wrapper');
+    const runner = new Runner('.interstitial-wrapper');
+    runner.loadSounds();
 }
 
 document.addEventListener('DOMContentLoaded', onDocumentLoad);
