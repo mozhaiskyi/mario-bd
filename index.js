@@ -501,9 +501,12 @@ const birthdayFunc = (isPlaying) => {
                     })
                 }
 
-                Object.keys(Runner.sounds).forEach((soundKey) => {
+                Promise.all(Object.keys(Runner.sounds).map((soundKey) => {
                     const soundUrl = resourceTemplate.getElementById(Runner.sounds[soundKey]).src
-                    loadSoundFile(soundUrl).then(decodeAudioData(soundKey))
+                    return loadSoundFile(soundUrl).then(decodeAudioData(soundKey))
+                })).then(() => {
+                    const loader = document.getElementById('loader');
+                    loader.parentNode.removeChild(loader);
                 })
             }
         },
