@@ -1674,7 +1674,7 @@
                 new CollisionBox(10, 8, 6, 9)
             ],
             numFrames: 2,
-            frameRate: 1000 / 6,
+            frameRate: 1000 / 2,
             speedOffset: .8
         }
     ];
