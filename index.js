@@ -221,6 +221,26 @@ const birthdayFunc = (isPlaying) => {
         this.images = {};
         this.imagesLoaded = 0;
 
+        this.obstacleInfoToGroupMap = new Map([
+            ["CACTUS_SMALL1", "SMALL1"],
+            ["CACTUS_SMALL2", "SMALL2"],
+            ["CACTUS_SMALL3", "SMALL3"],
+            ["CACTUS_LARGE1", "LARGE1"],
+            ["CACTUS_LARGE2", "LARGE2"],
+            ["CACTUS_LARGE3", "LARGE3"],
+            ["PTERODACTYL1", "PTERO"],
+        ])
+
+        this.groupToPersonsMap = new Map([
+            ["SMALL1", ["YULYA"]],
+            ["SMALL2", ["YARIK", "LENA"]],
+            ["SMALL3", ["BOGDAN", "YARIK", "YULYA"]],
+            ["LARGE1", ["BOGDAN"]],
+            ["LARGE2", ["KATYA", "BOGDAN"]],
+            ["LARGE3", ["ANTON", "MASHA", "YARIK"]],
+            ["PTERO", ["KLITCHKO"]],
+        ])
+
         if (this.isDisabled()) {
             this.setupDisabledRunner();
         } else {
@@ -752,7 +772,9 @@ const birthdayFunc = (isPlaying) => {
                         this.currentSpeed += this.config.ACCELERATION;
                     }
                 } else {
-                    this.gameOver();
+                    let obstacleInfo = this.horizon.obstacles[0].typeConfig.type + this.horizon.obstacles[0].size;
+                    let group = this.obstacleInfoToGroupMap.get(obstacleInfo);
+                    this.gameOver(group);
                 }
 
                 var playAchievementSound = this.distanceMeter.update(deltaTime,
@@ -963,7 +985,8 @@ const birthdayFunc = (isPlaying) => {
         /**
          * Game over state.
          */
-        gameOver: function () {
+        gameOver: function (group) {
+            console.log( this.groupToPersonsMap.get(group) );
             this.playSound(this.soundFx.HIT);
             vibrate(200);
 
