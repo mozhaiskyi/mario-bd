@@ -192,3 +192,9 @@ html, body {
   font-family: system-ui, sans-serif;
   color: rgb(95 99 104);
 }
+
+.victory{
+  top: 0;
+  left: 0;
+  position: absolute;
+}
