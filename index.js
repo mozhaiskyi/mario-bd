@@ -212,7 +212,7 @@ const moveFirstSongToTheEnd = (sounds, person) => {
         this.distanceRan = 0;
 
         this.highestScore = 0;
-        this.FRED_REQUIRES_SCORE = 300;
+        this.FRED_REQUIRES_SCORE = 1299;
 
         this.time = 0;
         this.runningTime = 0;
