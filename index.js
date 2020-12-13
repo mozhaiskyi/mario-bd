@@ -3,14 +3,16 @@
 // found in the LICENSE file.
 // extract from chromium source code by @liuwayong
 
-const birthdayFunc = (isPlaying) => {
+const firework = (isPlaying) => {
     // helper functions
     const PI2 = Math.PI * 2
     const random = (min, max) => Math.random() * (max - min + 1) + min | 0
     const timestamp = _ => new Date().getTime()
 
     const canvas = document.createElement('canvas')
+    const happyB8 = document.getElementById('happy-b8-box')
     canvas.classList.add('victory')
+    happyB8.classList.add('visible')
     document.body.appendChild(canvas)
     const ctx = canvas.getContext('2d')
 
@@ -140,6 +142,7 @@ const birthdayFunc = (isPlaying) => {
     (function loop() {
         if(isPlaying()){
             document.body.removeChild(canvas)
+            happyB8.classList.remove('visible')
         } else{
             requestAnimationFrame(loop)
 
@@ -1423,7 +1426,7 @@ const moveFirstSongToTheEnd = (sounds, person) => {
                     restartSourceHeight *= 2;
                 }
 
-                birthdayFunc(isPlaying);
+                firework(isPlaying);
 
                 const canvasCtx = canvas.getContext('2d')
                 // canvasCtx.font = '48px sans-serif';
