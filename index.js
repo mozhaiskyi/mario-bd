@@ -270,6 +270,7 @@ const moveFirstSongToTheEnd = (sounds, person) => {
             ROMAN: 'ROMAN', // TODO add to any group
             SKOROHOD: 'SKOROHOD',  // TODO add to any group
             YARIK: 'YARIK',
+            YELYZA: 'YELYZA', // TODO add to any group
             YULIA: 'YULIA',
         }
 
@@ -441,6 +442,12 @@ const moveFirstSongToTheEnd = (sounds, person) => {
         ARTEM2: 'artem2',
         ARTEM3: 'artem3',
         KLITSCHKO: 'klitschko',
+        KATYA1: 'katya1',
+        KATYA2: 'katya2',
+        KATYA3: 'katya3',
+        YELYZA1: 'yelyza1',
+        YELYZA2: 'yelyza2',
+        YELYZA3: 'yelyza3',
     };
 
 
