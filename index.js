@@ -494,6 +494,7 @@ const birthdayFunc = (isPlaying) => {
                 const resourceTemplate =
                   document.getElementById(this.config.RESOURCE_TEMPLATE_ID).content
 
+                const getSoundUrl = (soundId) => resourceTemplate.getElementById(soundId).src
                 const loadSoundFile = (url) => fetch(url).then(res => res.arrayBuffer())
                 const decodeAudioData = (key) => (buffer) => {
                     this.audioContext.decodeAudioData(buffer).then(audioData => {
@@ -501,12 +502,16 @@ const birthdayFunc = (isPlaying) => {
                     })
                 }
 
-                Promise.all(Object.keys(Runner.sounds).map((soundKey) => {
-                    const soundUrl = resourceTemplate.getElementById(Runner.sounds[soundKey]).src
+                const {VICTORY, ...sounds} = Runner.sounds
+
+                Promise.all(Object.keys(sounds).map((soundKey) => {
+                    const soundUrl = getSoundUrl(Runner.sounds[soundKey])
                     return loadSoundFile(soundUrl).then(decodeAudioData(soundKey))
                 })).then(() => {
                     const loader = document.getElementById('loader');
                     loader.parentNode.removeChild(loader);
+                }).then(() => {
+                    loadSoundFile(getSoundUrl(VICTORY)).then(decodeAudioData('VICTORY'))
                 })
             }
         },
