@@ -233,6 +233,7 @@ const moveFirstSongToTheEnd = (sounds, person) => {
         this.playCount = 0;
 
         // Sound FX.
+        this.soundsLoaded = false;
         this.audioBuffer = null;
         this.soundFx = {};
         this.victorySong = null;
@@ -585,10 +586,11 @@ const moveFirstSongToTheEnd = (sounds, person) => {
                         }
                     })
                 }).then(() => {
-                    const loader = document.getElementById('loader')
-                    if (loader) {
-                        loader.parentNode.removeChild(loader)
-                    }
+                    this.soundsLoaded = true
+                    // const loader = document.getElementById('loader')
+                    // if (loader) {
+                    //     loader.parentNode.removeChild(loader)
+                    // }
                 }).finally(() => {
                     loadSoundFile(getSoundUrl(VICTORY))
                       .then(decodeAudioData)
@@ -971,6 +973,8 @@ const moveFirstSongToTheEnd = (sounds, person) => {
          * @param {Event} e
          */
         onKeyDown: function (e) {
+            if(!this.soundsLoaded) return
+
             // Prevent native page scrolling whilst tapping on mobile.
             if (IS_MOBILE && this.playing) {
                 e.preventDefault();
@@ -1017,6 +1021,8 @@ const moveFirstSongToTheEnd = (sounds, person) => {
          * @param {Event} e
          */
         onKeyUp: function (e) {
+            if(!this.soundsLoaded) return
+
             var keyCode = String(e.keyCode);
             var isjumpKey = Runner.keycodes.JUMP[keyCode] ||
                 e.type == Runner.events.TOUCHEND ||
