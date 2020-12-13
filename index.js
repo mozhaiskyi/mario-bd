@@ -152,20 +152,28 @@ const birthdayFunc = (isPlaying) => {
     })()
 }
 
-/**
- * Creates a new Uint8Array based on two different ArrayBuffers
- *
- * @private
- * @param {ArrayBuffers} buffer1 The first buffer.
- * @param {ArrayBuffers} buffer2 The second buffer.
- * @return {ArrayBuffers} The new ArrayBuffer created out of the two.
- */
-const appendBuffer = function(buffer1, buffer2) {
-    const tmp = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
-    tmp.set(new Uint8Array(buffer1), 0);
-    tmp.set(new Uint8Array(buffer2), buffer1.byteLength);
-    return tmp.buffer;
+const appendBuffer = ctx => (buffer1, buffer2) => {
+    const numberOfChannels = Math.min( buffer1.numberOfChannels, buffer2.numberOfChannels );
+    const tmp = ctx.createBuffer( numberOfChannels, (buffer1.length + buffer2.length), buffer1.sampleRate );
+    [...Array(numberOfChannels).keys()].forEach((i) => {
+        const channel = tmp.getChannelData(i);
+        channel.set(buffer1.getChannelData(i), 0);
+        channel.set(buffer2.getChannelData(i), buffer1.length);
+    })
+    return tmp;
 };
+
+const getFirstSong = (sounds) => person => sounds[person] && sounds[person][0]
+const moveFirstSongToTheEnd = (sounds, person) => {
+    if(sounds[person]){
+        const [first, ...newSounds] = sounds[person]
+        return {
+            ...sounds,
+            [person]: [...newSounds, first]
+        }
+    }
+    return sounds;
+}
 
 (function () {
     'use strict';
@@ -246,14 +254,25 @@ const appendBuffer = function(buffer1, buffer2) {
             ["PTERODACTYL1", "PTERO"],
         ])
 
+        this.persons = {
+            ANTON: 'ANTON',
+            BOGDAN: 'BOGDAN',
+            LENA: 'LENA',
+            MASHA: 'MASHA',
+            KATYA: 'KATYA',
+            KLITCHKO: 'KLITCHKO',
+            YARIK: 'YARIK',
+            YULIA: 'YULIA',
+        }
+
         this.groupToPersonsMap = new Map([
-            ["SMALL1", ["YULIA"]],
-            ["SMALL2", ["YARIK", "LENA"]],
-            ["SMALL3", ["BOGDAN", "YARIK", "YULIA"]],
-            ["LARGE1", ["BOGDAN"]],
-            ["LARGE2", ["KATYA", "BOGDAN"]],
-            ["LARGE3", ["ANTON", "MASHA", "YARIK"]],
-            ["PTERO", ["KLITCHKO"]],
+            ["SMALL1", [this.persons.YULIA]],
+            // ["SMALL2", [this.persons.YARIK, this.persons.LENA]],
+            ["SMALL3", [this.persons.BOGDAN, this.persons.YARIK, this.persons.YULIA]],
+            ["LARGE1", [this.persons.BOGDAN]],
+            ["LARGE2", [this.persons.KATYA, this.persons.BOGDAN]],
+            // ["LARGE3", [this.persons.ANTON, this.persons.MASHA, this.persons.YARIK]],
+            ["PTERO", [this.persons.KLITCHKO]],
         ])
 
         if (this.isDisabled()) {
@@ -517,24 +536,39 @@ const appendBuffer = function(buffer1, buffer2) {
 
                 const getSoundUrl = (soundId) => resourceTemplate.getElementById(soundId).src
                 const loadSoundFile = (url) => fetch(url).then(res => res.arrayBuffer())
-                const decodeAudioData = (key) => (buffer) => {
-                    this.audioContext.decodeAudioData(buffer).then(audioData => {
-                        this.soundFx[key] = audioData
-                    })
-                }
+                const decodeAudioData = (buffer) => this.audioContext.decodeAudioData(buffer)
 
                 const {VICTORY, ...sounds} = Runner.sounds
 
-                Promise.all(Object.keys(sounds).map((soundKey) => {
-                    const soundUrl = getSoundUrl(Runner.sounds[soundKey])
-                    return loadSoundFile(soundUrl).then(decodeAudioData(soundKey))
-                })).then(() => {
-                    const loader = document.getElementById('loader');
-                    if(loader) {
-                        loader.parentNode.removeChild(loader);
-                    }
+                const soundKeys = Object.keys(sounds)
+                const persons = Object.keys(this.persons)
+
+                Promise.all(
+                  soundKeys.map((soundKey) => {
+                      const soundUrl = getSoundUrl(Runner.sounds[soundKey])
+                      return loadSoundFile(soundUrl).then(decodeAudioData)
+                  }),
+                ).then((audioBuffers) => {
+                    audioBuffers.forEach((audioBuffer, i) => {
+                        const soundKey = soundKeys[i]
+                        const name = persons.find(p => soundKey.startsWith(p))
+                        if (name) {
+                            this.soundFx[name] = this.soundFx[name] ? [...this.soundFx[name], audioBuffer] : [audioBuffer]
+                        } else {
+                            this.soundFx[soundKey] = audioBuffer
+                        }
+                    })
                 }).then(() => {
-                    loadSoundFile(getSoundUrl(VICTORY)).then(decodeAudioData('VICTORY'))
+                    const loader = document.getElementById('loader')
+                    if (loader) {
+                        loader.parentNode.removeChild(loader)
+                    }
+                }).finally(() => {
+                    loadSoundFile(getSoundUrl(VICTORY))
+                      .then(decodeAudioData)
+                      .then(audioBuffer => {
+                          this.soundFx['VICTORY'] = audioBuffer
+                      })
                 })
             }
         },
@@ -920,7 +954,6 @@ const appendBuffer = function(buffer1, buffer2) {
                 if (!this.crashed && !this.won && (Runner.keycodes.JUMP[e.keyCode] ||
                     e.type == Runner.events.TOUCHSTART)) {
                     if (!this.playing) {
-                        this.loadSounds();
                         this.playing = true;
                         this.update();
                         if (window.errorPageController) {
@@ -1017,9 +1050,11 @@ const appendBuffer = function(buffer1, buffer2) {
          * Game over state.
          */
         gameOver: function (group) {
-            console.log( this.groupToPersonsMap.get(group) );
+            const persons = this.groupToPersonsMap.get(group) || this.groupToPersonsMap.get('SMALL1')
+            const song = persons.map(getFirstSong(this.soundFx)).filter(Boolean).reduce(appendBuffer(this.audioContext))
+            this.soundFx = persons.reduce(moveFirstSongToTheEnd, this.soundFx)
 
-            this.playSound(this.soundFx.HIT);
+            this.playSound(song);
             vibrate(200);
 
             this.stop();
