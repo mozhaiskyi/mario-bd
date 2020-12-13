@@ -259,24 +259,27 @@ const moveFirstSongToTheEnd = (sounds, person) => {
 
         this.persons = {
             ANTON: 'ANTON',
+            ARTEM: 'ARTEM', // TODO add to any group
             BOGDAN: 'BOGDAN',
             LENA: 'LENA',
             MASHA: 'MASHA',
             MYKHAILO: 'MYKHAILO', // TODO add to any group
             KATYA: 'KATYA',
-            KLITCHKO: 'KLITCHKO',
+            KLITSCHKO: 'KLITSCHKO',
+            ROMAN: 'ROMAN', // TODO add to any group
+            SKOROHOD: 'SKOROHOD',  // TODO add to any group
             YARIK: 'YARIK',
             YULIA: 'YULIA',
         }
 
         this.groupToPersonsMap = new Map([
             ["SMALL1", [this.persons.YULIA]],
-            // ["SMALL2", [this.persons.YARIK, this.persons.LENA]],
+            ["SMALL2", [this.persons.YARIK, this.persons.LENA]],
             ["SMALL3", [this.persons.BOGDAN, this.persons.YARIK, this.persons.YULIA]],
             ["LARGE1", [this.persons.BOGDAN]],
             ["LARGE2", [this.persons.KATYA, this.persons.BOGDAN]],
-            // ["LARGE3", [this.persons.ANTON, this.persons.MASHA, this.persons.YARIK]],
-            ["PTERO", [this.persons.KLITCHKO]],
+            ["LARGE3", [this.persons.ANTON, this.persons.MASHA, this.persons.YARIK]],
+            ["PTERO", [this.persons.KLITSCHKO]],
         ])
 
         if (this.isDisabled()) {
@@ -421,6 +424,22 @@ const moveFirstSongToTheEnd = (sounds, person) => {
         MYKHAILO1: 'mykhailo1',
         MYKHAILO2: 'mykhailo2',
         MYKHAILO3: 'mykhailo3',
+        ROMAN1: 'roman1',
+        ROMAN2: 'roman2',
+        ROMAN3: 'roman3',
+        LENA1: 'lena1',
+        LENA2: 'lena2',
+        LENA3: 'lena3',
+        YARIK1: 'yarik1',
+        YARIK2: 'yarik2',
+        YARIK3: 'yarik3',
+        SKOROHOD1: 'skorohod1',
+        SKOROHOD2: 'skorohod2',
+        SKOROHOD3: 'skorohod3',
+        ARTEM1: 'artem1',
+        ARTEM2: 'artem2',
+        ARTEM3: 'artem3',
+        KLITSCHKO: 'klitschko',
     };
 
 
@@ -1057,7 +1076,7 @@ const moveFirstSongToTheEnd = (sounds, person) => {
          * Game over state.
          */
         gameOver: function (group) {
-            const persons = this.groupToPersonsMap.get(group) || this.groupToPersonsMap.get('SMALL1')
+            const persons = this.groupToPersonsMap.get(group)
             const song = persons.map(getFirstSong(this.soundFx)).filter(Boolean).reduce(appendBuffer(this.audioContext))
             this.soundFx = persons.reduce(moveFirstSongToTheEnd, this.soundFx)
 
