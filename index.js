@@ -279,7 +279,7 @@ const moveFirstSongToTheEnd = (sounds, person) => {
             ["SMALL2", [this.persons.YARIK, this.persons.LENA]],
             ["SMALL3", [this.persons.MYKHAILO, this.persons.YELYZA, this.persons.ROMAN]],
             ["LARGE1", [this.persons.ARTEM]],
-            ["LARGE2", [this.persons.KATYA, this.persons.BOGDAN]],
+            ["LARGE2", [this.persons.BOGDAN, this.persons.KATYA]],
             ["LARGE3", [this.persons.ANTON, this.persons.MASHA, this.persons.SKOROHOD]],
             ["PTERO", [this.persons.KLITSCHKO]],
         ])
