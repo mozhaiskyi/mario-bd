@@ -448,6 +448,12 @@ const moveFirstSongToTheEnd = (sounds, person) => {
         YELYZA1: 'yelyza1',
         YELYZA2: 'yelyza2',
         YELYZA3: 'yelyza3',
+        MASHA1: 'masha1',
+        MASHA2: 'masha2',
+        MASHA3: 'masha3',
+        ANTON1: 'anton1',
+        ANTON2: 'anton2',
+        ANTON3: 'anton3',
     };
 
 
