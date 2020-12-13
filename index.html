@@ -116,7 +116,7 @@
 
     document.addEventListener('keydown', (event) => {
         if (window.Runner && window.Runner.instance_ && window.Runner.instance_.soundsLoaded) {
-            if (event.code === 'Space') {
+            if (['Space', 'ArrowUp'].includes(event.code)) {
                 // document.getElementById('messageBox').style.visibility = 'hidden'
                 document.getElementById('details').style.visibility = 'hidden'
 
