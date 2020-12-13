@@ -95,10 +95,10 @@
     window.addEventListener('load', () => {
         consoleWrapper.log(messages.neTupi)
     })
-    window.addEventListener('beforeunload', (event) => {
-        event.preventDefault()
-        event.returnValue = messages.neTupi
-    })
+    // window.addEventListener('beforeunload', (event) => {
+    //     event.preventDefault()
+    //     event.returnValue = messages.neTupi
+    // })
 
     document.addEventListener('keydown', (event) => {
         if (event.code === 'Space') {
