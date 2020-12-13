@@ -232,9 +232,9 @@ const birthdayFunc = (isPlaying) => {
         ])
 
         this.groupToPersonsMap = new Map([
-            ["SMALL1", ["YULYA"]],
+            ["SMALL1", ["YULIA"]],
             ["SMALL2", ["YARIK", "LENA"]],
-            ["SMALL3", ["BOGDAN", "YARIK", "YULYA"]],
+            ["SMALL3", ["BOGDAN", "YARIK", "YULIA"]],
             ["LARGE1", ["BOGDAN"]],
             ["LARGE2", ["KATYA", "BOGDAN"]],
             ["LARGE3", ["ANTON", "MASHA", "YARIK"]],
@@ -374,6 +374,12 @@ const birthdayFunc = (isPlaying) => {
         SCORE: 'offline-sound-reached',
         VICTORY: 'happy-b8-song',
         MAIN: 'main-song',
+        BOGDAN1: 'bogdan1',
+        BOGDAN2: 'bogdan2',
+        BOGDAN3: 'bogdan3',
+        YULIA1: 'yulia1',
+        YULIA2: 'yulia2',
+        YULIA3: 'yulia3',
     };
 
 
@@ -509,7 +515,9 @@ const birthdayFunc = (isPlaying) => {
                     return loadSoundFile(soundUrl).then(decodeAudioData(soundKey))
                 })).then(() => {
                     const loader = document.getElementById('loader');
-                    loader.parentNode.removeChild(loader);
+                    if(loader) {
+                        loader.parentNode.removeChild(loader);
+                    }
                 }).then(() => {
                     loadSoundFile(getSoundUrl(VICTORY)).then(decodeAudioData('VICTORY'))
                 })
@@ -995,6 +1003,7 @@ const birthdayFunc = (isPlaying) => {
          */
         gameOver: function (group) {
             console.log( this.groupToPersonsMap.get(group) );
+
             this.playSound(this.soundFx.HIT);
             vibrate(200);
 
