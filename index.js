@@ -260,27 +260,27 @@ const moveFirstSongToTheEnd = (sounds, person) => {
 
         this.persons = {
             ANTON: 'ANTON',
-            ARTEM: 'ARTEM', // TODO add to any group
+            ARTEM: 'ARTEM',
             BOGDAN: 'BOGDAN',
             LENA: 'LENA',
             MASHA: 'MASHA',
-            MYKHAILO: 'MYKHAILO', // TODO add to any group
+            MYKHAILO: 'MYKHAILO',
             KATYA: 'KATYA',
             KLITSCHKO: 'KLITSCHKO',
-            ROMAN: 'ROMAN', // TODO add to any group
-            SKOROHOD: 'SKOROHOD',  // TODO add to any group
+            ROMAN: 'ROMAN',
+            SKOROHOD: 'SKOROHOD',
             YARIK: 'YARIK',
-            YELYZA: 'YELYZA', // TODO add to any group
+            YELYZA: 'YELYZA',
             YULIA: 'YULIA',
         }
 
         this.groupToPersonsMap = new Map([
             ["SMALL1", [this.persons.YULIA]],
             ["SMALL2", [this.persons.YARIK, this.persons.LENA]],
-            ["SMALL3", [this.persons.BOGDAN, this.persons.YARIK, this.persons.YULIA]],
-            ["LARGE1", [this.persons.BOGDAN]],
+            ["SMALL3", [this.persons.MYKHAILO, this.persons.YELYZA, this.persons.ROMAN]],
+            ["LARGE1", [this.persons.ARTEM]],
             ["LARGE2", [this.persons.KATYA, this.persons.BOGDAN]],
-            ["LARGE3", [this.persons.ANTON, this.persons.MASHA, this.persons.YARIK]],
+            ["LARGE3", [this.persons.ANTON, this.persons.MASHA, this.persons.SKOROHOD]],
             ["PTERO", [this.persons.KLITSCHKO]],
         ])
 
