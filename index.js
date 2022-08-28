@@ -415,7 +415,7 @@ const moveFirstSongToTheEnd = (sounds, person) => {
         SCORE: 'offline-sound-reached',
         VICTORY: 'happy-b8-song',
         MAIN: 'main-song',
-        KLITSCHKO: 'klitschko',
+        Q: 'q',
         RAM: 'ramazan',
         MISHA1: 'misha1',
         MISHA2: 'misha2',
@@ -1060,12 +1060,15 @@ const moveFirstSongToTheEnd = (sounds, person) => {
          * Game over state.
          */
         gameOver: function (group) {
-            const persons = this.groupToPersonsMap.get(group)
-            const song = persons.map(getFirstSong(this.soundFx)).filter(Boolean).reduce(appendBuffer(this.audioContext))
-            this.soundFx = persons.reduce(moveFirstSongToTheEnd, this.soundFx)
+            try {
+                const persons = this.groupToPersonsMap.get(group)
+                const song = persons.map(getFirstSong(this.soundFx)).filter(Boolean).reduce(appendBuffer(this.audioContext))
+                this.soundFx = persons.reduce(moveFirstSongToTheEnd, this.soundFx)
 
-            this.playSound(song);
-            vibrate(200);
+                this.playSound(song);
+                vibrate(200);
+            } catch (_) {
+            }
 
             this.stop();
             this.crashed = true;
