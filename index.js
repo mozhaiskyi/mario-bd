@@ -419,6 +419,12 @@ const moveFirstSongToTheEnd = (sounds, person) => {
         RAM: 'ramazan',
         MISHA1: 'misha1',
         MISHA2: 'misha2',
+        ANA1: 'ana1',
+        ANA2: 'ana2',
+        ANA3: 'ana3',
+        ELHAM: 'elham',
+        NICOLE: 'nicole',
+        SLAVA: 'slava',
     };
 
 
